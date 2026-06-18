@@ -1,5 +1,5 @@
 const API_BASE_URL =
-  window.XHS_API_BASE_URL ||
+  window.XHS_API_BASE_URL?.trim() ||
   localStorage.getItem("XHS_API_BASE_URL") ||
   "http://localhost:8000";
 

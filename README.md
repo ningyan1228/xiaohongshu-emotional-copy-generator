@@ -7,6 +7,7 @@
 ```text
 /frontend
   index.html
+  config.js
   app.js
   style.css
 
@@ -29,11 +30,16 @@
 
 直接打开 `frontend/index.html` 即可预览页面。
 
-如需连接本地后端，在浏览器控制台设置：
+前端默认会请求：
+
+```text
+http://localhost:8000
+```
+
+如果已经有线上 Deno Deploy 后端，把 `frontend/config.js` 改成：
 
 ```js
-localStorage.setItem("XHS_API_BASE_URL", "http://localhost:8000");
-location.reload();
+window.XHS_API_BASE_URL = "https://xhs-copy-generator.deno.dev";
 ```
 
 ## 本地运行后端
@@ -90,21 +96,13 @@ https://xhs-copy-generator.deno.dev
 ## 部署前端到 GitHub Pages
 
 1. 将 `frontend` 目录提交到 GitHub 仓库。
-2. 在 GitHub Pages 中选择部署静态文件。
-3. 打开页面后，在浏览器控制台写入后端地址：
+2. 将 `frontend/config.js` 里的后端地址改成你的 Deno Deploy 地址：
 
 ```js
-localStorage.setItem("XHS_API_BASE_URL", "https://xhs-copy-generator.deno.dev");
-location.reload();
+window.XHS_API_BASE_URL = "https://xhs-copy-generator.deno.dev";
 ```
 
-如果你想把后端地址写死到前端，也可以在 `frontend/index.html` 的 `app.js` 前添加：
-
-```html
-<script>
-  window.XHS_API_BASE_URL = "https://xhs-copy-generator.deno.dev";
-</script>
-```
+3. 在 GitHub Pages 中选择部署静态文件。
 
 ## SiliconFlow
 
