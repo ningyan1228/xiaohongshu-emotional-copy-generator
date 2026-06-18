@@ -1,6 +1,12 @@
-const SILICONFLOW_URL = "https://api.siliconflow.cn/v1/chat/completions";
-const MODEL = Deno.env.get("SILICONFLOW_MODEL") || "deepseek-chat";
-const API_KEY = Deno.env.get("SILICONFLOW_API_KEY");
+const AI_BASE_URL = normalizeBaseUrl(
+  Deno.env.get("AI_BASE_URL") || "https://api.siliconflow.cn/v1"
+);
+const AI_URL = `${AI_BASE_URL}/chat/completions`;
+const MODEL =
+  Deno.env.get("AI_MODEL") ||
+  Deno.env.get("SILICONFLOW_MODEL") ||
+  "deepseek-ai/DeepSeek-V3.2";
+const API_KEY = Deno.env.get("AI_API_KEY") || Deno.env.get("SILICONFLOW_API_KEY");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": Deno.env.get("ALLOWED_ORIGIN") || "*",
@@ -26,7 +32,7 @@ Deno.serve(async (request) => {
   }
 
   if (!API_KEY) {
-    return json({ error: "Missing SILICONFLOW_API_KEY" }, 500);
+    return json({ error: "Missing AI_API_KEY or SILICONFLOW_API_KEY" }, 500);
   }
 
   try {
@@ -49,7 +55,7 @@ Deno.serve(async (request) => {
 async function generateCopy(keyword: string, style: string): Promise<string[]> {
   const styleRule = stylePrompts[style] || stylePrompts.emotional;
 
-  const response = await fetch(SILICONFLOW_URL, {
+  const response = await fetch(AI_URL, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${API_KEY}`,
@@ -118,6 +124,10 @@ function parseLines(content: string): string[] {
 
 function unique(items: string[]): string[] {
   return [...new Set(items)];
+}
+
+function normalizeBaseUrl(value: string): string {
+  return value.replace(/\/+$/, "");
 }
 
 function json(data: unknown, status = 200): Response {
