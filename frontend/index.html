@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>小红书情绪文案生成器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body class="min-h-screen bg-[#f8f4ef] text-[#231f20]">
+    <main class="mx-auto flex min-h-screen w-full max-w-3xl flex-col px-4 py-6 sm:px-6 sm:py-10">
+      <section class="flex flex-1 flex-col gap-5">
+        <header class="space-y-2">
+          <p class="text-sm font-medium text-[#e64b64]">Xiaohongshu Emotional Copy Generator</p>
+          <h1 class="text-3xl font-bold tracking-normal sm:text-4xl">小红书情绪文案生成器</h1>
+          <p class="max-w-xl text-sm leading-6 text-[#6d6260]">
+            输入产品关键词，一键生成 20 条短促、夸张、像真实用户在疯狂安利的情绪文案。
+          </p>
+        </header>
+
+        <form id="copyForm" class="rounded-lg border border-[#eadfd8] bg-white p-4 shadow-sm sm:p-5">
+          <div class="grid gap-4">
+            <label class="grid gap-2">
+              <span class="text-sm font-semibold">产品关键词</span>
+              <input
+                id="keywordInput"
+                class="min-h-12 rounded-md border border-[#d9cbc4] px-3 text-base outline-none transition focus:border-[#e64b64] focus:ring-2 focus:ring-[#e64b64]/15"
+                type="text"
+                placeholder="例如：护手霜、零食、香薰"
+                autocomplete="off"
+                required
+              />
+            </label>
+
+            <label class="grid gap-2">
+              <span class="text-sm font-semibold">生成风格</span>
+              <select
+                id="styleSelect"
+                class="min-h-12 rounded-md border border-[#d9cbc4] bg-white px-3 text-base outline-none transition focus:border-[#e64b64] focus:ring-2 focus:ring-[#e64b64]/15"
+              >
+                <option value="emotional">情绪爆款</option>
+                <option value="hype">夸张种草</option>
+                <option value="request">求链接风格</option>
+              </select>
+            </label>
+
+            <div class="flex flex-col gap-3 sm:flex-row">
+              <button
+                id="generateBtn"
+                class="min-h-12 flex-1 rounded-md bg-[#e64b64] px-5 text-base font-bold text-white transition hover:bg-[#d83e58] disabled:cursor-not-allowed disabled:bg-[#d9a6b0]"
+                type="submit"
+              >
+                生成20条
+              </button>
+              <button
+                id="againBtn"
+                class="hidden min-h-12 rounded-md border border-[#e64b64] px-5 text-base font-bold text-[#e64b64] transition hover:bg-[#fff1f4] disabled:cursor-not-allowed disabled:opacity-60"
+                type="button"
+              >
+                再来一批
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <section class="grid gap-3">
+          <div class="flex items-center justify-between gap-3">
+            <h2 class="text-lg font-bold">生成结果</h2>
+            <p id="statusText" class="text-sm text-[#8a7b76]"></p>
+          </div>
+          <ol id="resultList" class="grid gap-2"></ol>
+        </section>
+      </section>
+    </main>
+
+    <template id="resultItemTemplate">
+      <li class="result-item rounded-lg border border-[#eadfd8] bg-white p-3 shadow-sm">
+        <div class="flex items-center gap-3">
+          <p class="result-text min-w-0 flex-1 text-base font-semibold leading-7"></p>
+          <button
+            class="copy-btn h-10 shrink-0 rounded-md border border-[#d9cbc4] px-3 text-sm font-semibold text-[#5c504d] transition hover:border-[#e64b64] hover:text-[#e64b64]"
+            type="button"
+          >
+            复制
+          </button>
+        </div>
+      </li>
+    </template>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
