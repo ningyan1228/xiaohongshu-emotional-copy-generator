@@ -21,18 +21,21 @@ const stylePrompts: Record<string, string> = {
   request: "求链接 / 别停产 style，像评论区疯狂追问链接和囤货。",
 };
 
-const lengthProfiles: Record<string, { rule: string; maxChars: number }> = {
+const lengthProfiles: Record<string, { rule: string; minChars: number; maxChars: number }> = {
   short: {
     rule: "每条 10-18 个中文字符，短促、有冲击力。",
+    minChars: 6,
     maxChars: 20,
   },
   medium: {
-    rule: "每条 18-24 个中文字符，情绪完整，但不要像广告文案。",
+    rule: "每条必须 18-24 个中文字符，不要低于 18 字，情绪完整，但不要像广告文案。",
+    minChars: 16,
     maxChars: 26,
   },
   long: {
-    rule: "每条 26-34 个中文字符，有一点场景感和情绪递进，但仍然口语化。",
-    maxChars: 36,
+    rule: "每条必须 26-34 个中文字符，不要低于 26 字，要有一点场景感和情绪递进，但仍然口语化。",
+    minChars: 24,
+    maxChars: 38,
   },
 };
 
@@ -85,17 +88,18 @@ async function generateCopy(
     body: JSON.stringify({
       model: MODEL,
       temperature: 0.92,
-      max_tokens: 800,
+      max_tokens: copyLength === "long" ? 1200 : 900,
       messages: [
         {
           role: "system",
           content: [
             "You are a viral Xiaohongshu copywriting expert.",
-            "You generate emotional, exaggerated, short viral sentences.",
+            "You generate emotional, exaggerated, viral Xiaohongshu-style copy.",
             "",
             "Rules:",
             "- Output 20 lines",
             `- ${lengthProfile.rule}`,
+            "- The selected length requirement is strict. Do not make every line a very short slogan.",
             "- No explanations",
             "- No hashtags in output",
             "- Must feel like real user emotional posts",
@@ -110,7 +114,7 @@ async function generateCopy(
             `风格要求：${styleRule}`,
             `长度要求：${lengthProfile.rule}`,
             "",
-            "请直接输出 20 行中文文案，每行一条，不要编号。",
+            "请直接输出 20 行中文文案，每行一条，不要编号。每条都要满足长度要求，太短的句子不要输出。",
           ].join("\n"),
         },
       ],
@@ -124,10 +128,10 @@ async function generateCopy(
 
   const data = await response.json();
   const content = data?.choices?.[0]?.message?.content || "";
-  return parseLines(content, lengthProfile.maxChars);
+  return parseLines(content, lengthProfile.minChars, lengthProfile.maxChars);
 }
 
-function parseLines(content: string, maxChars: number): string[] {
+function parseLines(content: string, minChars: number, maxChars: number): string[] {
   const lines = content
     .split(/\r?\n/)
     .map((line) =>
@@ -139,6 +143,7 @@ function parseLines(content: string, maxChars: number): string[] {
     )
     .filter(Boolean)
     .filter((line) => !line.includes("#"))
+    .filter((line) => line.length >= minChars)
     .map((line) => line.slice(0, maxChars));
 
   return unique(lines).slice(0, 20);
