@@ -29,12 +29,12 @@ const lengthProfiles: Record<string, { rule: string; minChars: number; maxChars:
   },
   medium: {
     rule: "每条必须 18-24 个中文字符，不要低于 18 字，情绪完整，但不要像广告文案。",
-    minChars: 16,
+    minChars: 14,
     maxChars: 26,
   },
   long: {
     rule: "每条必须 26-34 个中文字符，不要低于 26 字，要有一点场景感和情绪递进，但仍然口语化。",
-    minChars: 24,
+    minChars: 18,
     maxChars: 38,
   },
 };
@@ -100,6 +100,7 @@ async function generateCopy(
             "- Output 20 lines",
             `- ${lengthProfile.rule}`,
             "- The selected length requirement is strict. Do not make every line a very short slogan.",
+            "- For long copy, use a comma or a short scenario to make the sentence naturally longer.",
             "- No explanations",
             "- No hashtags in output",
             "- Must feel like real user emotional posts",
@@ -114,7 +115,7 @@ async function generateCopy(
             `风格要求：${styleRule}`,
             `长度要求：${lengthProfile.rule}`,
             "",
-            "请直接输出 20 行中文文案，每行一条，不要编号。每条都要满足长度要求，太短的句子不要输出。",
+            "请直接输出 20 行中文文案，每行一条，不要编号。每条尽量满足长度要求，长文案要像真实用户在描述具体感受。",
           ].join("\n"),
         },
       ],
@@ -143,10 +144,10 @@ function parseLines(content: string, minChars: number, maxChars: number): string
     )
     .filter(Boolean)
     .filter((line) => !line.includes("#"))
-    .filter((line) => line.length >= minChars)
     .map((line) => line.slice(0, maxChars));
 
-  return unique(lines).slice(0, 20);
+  const preferred = lines.filter((line) => line.length >= minChars);
+  return unique([...preferred, ...lines]).slice(0, 20);
 }
 
 function unique(items: string[]): string[] {
