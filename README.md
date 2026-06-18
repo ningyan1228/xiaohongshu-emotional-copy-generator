@@ -79,13 +79,16 @@ POST /api/generate
 
 1. 打开 Deno Deploy 并创建新项目。
 2. 入口文件选择 `backend/main.ts`。
-3. 设置环境变量：
+3. 设置环境变量。推荐使用这组变量名：
 
 ```text
-SILICONFLOW_API_KEY=你的 SiliconFlow API Key
-SILICONFLOW_MODEL=deepseek-chat
+AI_API_KEY=你的 SiliconFlow API Key
+AI_BASE_URL=https://api.siliconflow.cn/v1
+AI_MODEL=deepseek-ai/DeepSeek-V3.2
 ALLOWED_ORIGIN=https://your-name.github.io
 ```
+
+后端也兼容旧变量名 `SILICONFLOW_API_KEY` 和 `SILICONFLOW_MODEL`，但如果你已有可正常调用 SiliconFlow 的 app，建议直接复用它的 `AI_API_KEY`、`AI_BASE_URL`、`AI_MODEL` 配置。
 
 4. 部署完成后记录后端地址，例如：
 
@@ -115,7 +118,7 @@ POST https://api.siliconflow.cn/v1/chat/completions
 默认模型：
 
 ```text
-deepseek-chat
+deepseek-ai/DeepSeek-V3.2
 ```
 
-也可通过环境变量 `SILICONFLOW_MODEL` 改成你账户支持的 DeepSeek 模型。
+也可通过环境变量 `AI_MODEL` 改成你账户支持的 DeepSeek 模型。
