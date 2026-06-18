@@ -21,6 +21,21 @@ const stylePrompts: Record<string, string> = {
   request: "求链接 / 别停产 style，像评论区疯狂追问链接和囤货。",
 };
 
+const lengthProfiles: Record<string, { rule: string; maxChars: number }> = {
+  short: {
+    rule: "每条 10-18 个中文字符，短促、有冲击力。",
+    maxChars: 20,
+  },
+  medium: {
+    rule: "每条 18-24 个中文字符，情绪完整，但不要像广告文案。",
+    maxChars: 26,
+  },
+  long: {
+    rule: "每条 26-34 个中文字符，有一点场景感和情绪递进，但仍然口语化。",
+    maxChars: 36,
+  },
+};
+
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders });
@@ -39,12 +54,13 @@ Deno.serve(async (request) => {
     const body = await request.json();
     const keyword = String(body.keyword || "").trim();
     const style = String(body.style || "emotional");
+    const copyLength = String(body.length || "short");
 
     if (!keyword) {
       return json({ error: "keyword is required" }, 400);
     }
 
-    const results = await generateCopy(keyword, style);
+    const results = await generateCopy(keyword, style, copyLength);
     return json({ results });
   } catch (error) {
     console.error(error);
@@ -52,8 +68,13 @@ Deno.serve(async (request) => {
   }
 });
 
-async function generateCopy(keyword: string, style: string): Promise<string[]> {
+async function generateCopy(
+  keyword: string,
+  style: string,
+  copyLength: string
+): Promise<string[]> {
   const styleRule = stylePrompts[style] || stylePrompts.emotional;
+  const lengthProfile = lengthProfiles[copyLength] || lengthProfiles.short;
 
   const response = await fetch(AI_URL, {
     method: "POST",
@@ -74,7 +95,7 @@ async function generateCopy(keyword: string, style: string): Promise<string[]> {
             "",
             "Rules:",
             "- Output 20 lines",
-            "- Each line under 20 Chinese characters",
+            `- ${lengthProfile.rule}`,
             "- No explanations",
             "- No hashtags in output",
             "- Must feel like real user emotional posts",
@@ -87,8 +108,9 @@ async function generateCopy(keyword: string, style: string): Promise<string[]> {
           content: [
             `产品关键词：${keyword}`,
             `风格要求：${styleRule}`,
+            `长度要求：${lengthProfile.rule}`,
             "",
-            "请直接输出 20 行中文短句，每行一条，不要编号。",
+            "请直接输出 20 行中文文案，每行一条，不要编号。",
           ].join("\n"),
         },
       ],
@@ -102,10 +124,10 @@ async function generateCopy(keyword: string, style: string): Promise<string[]> {
 
   const data = await response.json();
   const content = data?.choices?.[0]?.message?.content || "";
-  return parseLines(content);
+  return parseLines(content, lengthProfile.maxChars);
 }
 
-function parseLines(content: string): string[] {
+function parseLines(content: string, maxChars: number): string[] {
   const lines = content
     .split(/\r?\n/)
     .map((line) =>
@@ -117,7 +139,7 @@ function parseLines(content: string): string[] {
     )
     .filter(Boolean)
     .filter((line) => !line.includes("#"))
-    .map((line) => line.slice(0, 20));
+    .map((line) => line.slice(0, maxChars));
 
   return unique(lines).slice(0, 20);
 }
