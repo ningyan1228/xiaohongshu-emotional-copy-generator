@@ -6,6 +6,7 @@ const API_BASE_URL =
 const form = document.querySelector("#copyForm");
 const keywordInput = document.querySelector("#keywordInput");
 const styleSelect = document.querySelector("#styleSelect");
+const lengthSelect = document.querySelector("#lengthSelect");
 const generateBtn = document.querySelector("#generateBtn");
 const againBtn = document.querySelector("#againBtn");
 const statusText = document.querySelector("#statusText");
@@ -28,6 +29,7 @@ async function generateCopies(savedRequest) {
   const request = savedRequest || {
     keyword: keywordInput.value.trim(),
     style: styleSelect.value,
+    length: lengthSelect.value,
   };
 
   if (!request.keyword) {
